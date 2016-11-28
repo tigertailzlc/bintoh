@@ -37,12 +37,105 @@ class Game:
             print("currbits = " + str(self.currbits) + " currmove = " + str(self.currmove)) 
 
     def bitsToState(self): 
-        """Take the current bit array and translate to corresponding game state.""" 
-        pass
+        """Take the current bit array and translate to corresponding game state.
+
+        The rules of the simulation are as follows, and this function implements 
+        these rules. 
+        - The game begins with peg configuration O-M-D (origin-middle-destination). 
+        - We are in zeromode if we are currently reading 0 bits, and not o.w.. 
+        - In zeromode, we have pattern 0MDMD..MD, where the first 1 to appear is 
+          placed on the [M]iddle or [D]est peg according to its position. 
+        - Otherwise, we have pattern 1OMOM..OM, where the first 0 to appear is 
+          placed on the [O]rigin or [M]iddle peg according to its position. 
+        - We say that a 1-bit is even if its index is even, and odd o.w..
+        - Shifting in to zeromode does not reconfigure pegs; shifting out does.  
+        - Every even 1-bit is a Dest and sets an Origin to its LEFT. 
+        - Every odd 1-bit is a Dest and sets an Origin to its RIGHT. 
+        - If currbits[0]==1, that disc is placed on the Right peg.  
+        """ 
+
+        # Clear pegs from last call # 
+        #self.left = []
+        #self.center = [] 
+        #self.right = [] 
+
+        # Initialize state according to first bit # 
+        if (self.currbits[0]==1): 
+            zeromode = False 
+            destin = self.pegs[2] 
+            origin = self.pegs[1] 
+            middle = self.pegs[0] 
+        else: 
+            zeromode = True 
+            origin = self.pegs[0]
+            middle = self.pegs[1]
+            destin = self.pegs[2]
+        
+
+        i = 0 
+        # i is your current disc index. discs-i for intuition/rendering purposes. 
+        while (i<self.discs): 
+            if (zeromode): 
+                # This block should only be entered 0 or 1 times per call # 
+                j = 0 
+                while (i<self.discs and self.currbits[i]==0): 
+                    origin.append(self.discs-i) 
+                    i += 1 
+                    j += 1 
+
+                # Shifting out of zeromode: Update configs, in partic. dest # 
+                if ((j%2)==1): 
+                    # New dest peg is current middle peg 
+                    destin = middle 
+                    # Else, dest peg remains same; we do nothing. 
+                zeromode = False 
+            else: 
+                # INITIALLY not in zeromode # 
+                j = 0 
+                while (i<self.discs and self.currbits[i]==1): 
+                    destin.append(self.discs-i)
+                    i += 1 
+                    j += 1   
+
+                # Now we are back in zeromode # 
+                k = 0 
+                if ((j%2)==0): 
+                    # Stack 0 bits on middle peg #  
+                    while (i<self.discs and self.currbits[i]==0): 
+                        middle.append(self.discs-i) 
+                        i += 1 
+                        k += 1  
+                else: 
+                    # Stack 0 bits on origin peg # 
+                    while (i<self.discs and self.currbits[i]==0): 
+                        origin.append(self.discs-i) 
+                        i += 1 
+                        k += 1 
+
+                # Shifting out of zeromode: Update configs, in partic. dest #
+                if ((k%2)==1):
+                    # New dest peg is current middle peg
+                    destin = middle
+                    # Else, dest peg remains same; we do nothing.
+
+            destidx = self.pegs.index(destin) # Python is magic #
+
+            if ((i%2)==0): 
+                # We have an even 1-bit; set origin to LEFT of dest # 
+                origin = self.pegs[(destidx-1)%3]
+                middle = self.pegs[(destidx+1)%3]
+            else: 
+                # We have an odd 1-bit; set origin to RIGHT of dest #
+                origin = self.pegs[(destidx+1)%3]
+                middle = self.pegs[(destidx-1)%3]
+
 
     def render(self): 
         """Print current turn nbr/total turns req'd & a repr. of curr game state."""  
-        pass
+        # This is obviously not the actual final render function. #  
+        print("Left   = " + str(self.left))
+        print("Center = " + str(self.center))
+        print("Right  = " + str(self.right))
 
     def playOneTurn(self): 
         """Check if terminated, set up bit array, set game state, render, update.

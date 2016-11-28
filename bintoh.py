@@ -77,7 +77,7 @@ class Game:
         i = 0 
         # i is your current disc index. discs-i for intuition/rendering purposes. 
         while (i<self.discs): 
-            if (zeromode): 
+            if (zeromode):
                 # This block should only be entered 0 or 1 times per call # 
                 j = 0 
                 while (i<self.discs and self.currbits[i]==0): 
@@ -88,27 +88,29 @@ class Game:
                 # Shifting out of zeromode: Update configs, in partic. dest # 
                 if ((j%2)==1): 
                     # New dest peg is current middle peg 
-                    destin = middle 
+                    middidx = self.pegs.index(middle) 
+                    destin = self.pegs[middidx] 
                     # Else, dest peg remains same; we do nothing. 
                 zeromode = False 
-            else: 
-                # INITIALLY not in zeromode # 
+            else:
+                # Not in zeromode! # 
                 j = 0 
                 while (i<self.discs and self.currbits[i]==1): 
                     destin.append(self.discs-i)
                     i += 1 
                     j += 1   
 
+                # ***Naw dude you can't do this. 0010 need to update first*** # 
                 # Now we are back in zeromode # 
                 k = 0 
                 if ((j%2)==0): 
-                    # Stack 0 bits on middle peg #  
+                    # Stack 0-bits on middle peg #  
                     while (i<self.discs and self.currbits[i]==0): 
                         middle.append(self.discs-i) 
                         i += 1 
                         k += 1  
                 else: 
-                    # Stack 0 bits on origin peg # 
+                    # Stack 0-bits on origin peg # 
                     while (i<self.discs and self.currbits[i]==0): 
                         origin.append(self.discs-i) 
                         i += 1 
@@ -117,10 +119,11 @@ class Game:
                 # Shifting out of zeromode: Update configs, in partic. dest #
                 if ((k%2)==1):
                     # New dest peg is current middle peg
-                    destin = middle
+                    middidx = self.pegs.index(middle)
+                    destin = self.pegs[middidx]
                     # Else, dest peg remains same; we do nothing.
 
-            destidx = self.pegs.index(destin) # Python is magic #
+            destidx = self.pegs.index(destin) 
 
             if ((i%2)==0): 
                 # We have an even 1-bit; set origin to LEFT of dest # 

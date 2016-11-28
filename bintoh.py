@@ -55,9 +55,11 @@ class Game:
         """ 
 
         # Clear pegs from last call # 
-        #self.left = []
-        #self.center = [] 
-        #self.right = [] 
+        # Note: In an attempt to remain version-agnostic (between Python 2/3), 
+        # I am using del s[:] instead of s.clear(), which is new to v3.3.  
+        del self.left[:]
+        del self.center[:]
+        del self.right[:]
 
         # Initialize state according to first bit # 
         if (self.currbits[0]==1): 

@@ -35,7 +35,7 @@ class Game:
                 self.currbits.append(int(binmove[i-ldzeros])) 
 
         if (self.Verbose): 
-            print("currbits = " + str(self.currbits)) 
+            print("Bit Array = " + str(self.currbits)) 
 
     def bitsToState(self): 
         """Take the current bit array and translate to corresponding game state.
@@ -118,9 +118,10 @@ class Game:
         """Print current turn nbr/total turns req'd & a repr. of curr game state."""  
         # This is not the actual final render function. #  
         print("Current move: " + str(self.currmove+1) +"/"+ str(self.lastmove)) 
-        print("Left   = " + str(self.left))
-        print("Center = " + str(self.center))
-        print("Right  = " + str(self.right))
+        print("Left   Peg = " + str(self.left))
+        print("Center Peg = " + str(self.center))
+        print("Right  Peg = " + str(self.right))
+        print("\n")
 
     def playOneTurn(self): 
         """Check if terminated, set up bit array, set game state, render, update.
@@ -147,11 +148,11 @@ if __name__ == "__main__":
     numdiscs = (int(sys.argv[1])) 
     game = Game(numdiscs)
 
-    game.Verbose = True 
+    game.Verbose = False 
 
-    if (numdiscs==0 or numdiscs>100): 
-        # This upper bound is pretty arbitrary. # 
-        print("Please choose a number in [1,100].") 
+    if (numdiscs<=0):
+        # Upper bound? But what would it be? # 
+        print("Please choose a disc number of 1 or larger.") 
     else: 
         while (game.terminated==False): 
             game.playOneTurn()

@@ -150,6 +150,7 @@ if __name__ == "__main__":
     game.Verbose = True 
 
     if (numdiscs==0 or numdiscs>100): 
+        # This upper bound is pretty arbitrary. # 
         print("Please choose a number in [1,100].") 
     else: 
         while (game.terminated==False): 

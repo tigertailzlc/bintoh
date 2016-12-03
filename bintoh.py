@@ -5,7 +5,7 @@ class Game:
     """A game/tutorial of Tower of Hanoi.""" 
 
     def __init__(self, numdiscs):
-        self.Verbose = False # for testing/debugging purposes
+        self.Verbose = False # for debugging purposes
 
         self.terminated = False 
         self.discs = numdiscs
@@ -38,22 +38,21 @@ class Game:
             print("currbits = " + str(self.currbits)) 
 
     def bitsToState(self): 
-        # You'll need to update these! # 
         """Take the current bit array and translate to corresponding game state.
 
-        The rules of the simulation are as follows, and this function implements 
-        these rules. 
+        This function implements the rules of the simulation, which are the following:
         - The game begins with peg configuration O-M-D (origin-middle-destination). 
-        - We are in zeromode if we are currently reading 0 bits, and not o.w.. 
-        - In zeromode, we have pattern 0MDMD..MD, where the first 1 to appear is 
-          placed on the [M]iddle or [D]est peg according to its position. 
-        - Otherwise, we have pattern 1OMOM..OM, where the first 0 to appear is 
-          placed on the [O]rigin or [M]iddle peg according to its position. 
-        - We say that a 1-bit is even if its index is even, and odd o.w..
-        - Shifting in to zeromode does not reconfigure pegs; shifting out does.  
-        - Every even 1-bit is a Dest and sets an Origin to its LEFT. 
-        - Every odd 1-bit is a Dest and sets an Origin to its RIGHT. 
-        - If currbits[0]==1, that disc is placed on the Right peg.  
+        - We say that a 1-bit is even if its index is even, and odd otherwise. 
+        - Every even 1-bit sets a Dest and sets an Origin to its LEFT.    
+        - Every odd 1-bit sets a Dest and sets an Origin to its RIGHT. 
+        - 0-bits do not update the peg configuration. 
+        - If we are stacking discs represented by 1-bits onto the Dest peg, 
+          the position of the first disc represented by a 0-bit is determined 
+          by the following pattern: DOMOM..OM. Similarly, stacking 0-bit discs 
+          onto Origin or Middle pegs follows patterns OMDMD..MD and MODOD..OD 
+          respectively. A string of equal-valued bits represents a stack of 
+          consecutive discs on the same peg. 
+        - If currbits[0]==1, the largest disc is placed on the Right peg.  
         """ 
 
         # Clear pegs from last call # 
@@ -88,9 +87,6 @@ class Game:
 
             # About to set down a leading 1-bit, so update configs, in partic. dest # 
             if ((j%2)==1):
-                # New dest peg is current middle peg                                            
-                #destin = middle
-                # Else, dest peg remains same; we do nothing.  
                 if (anchor==origin): 
                    destin = middle 
                 else: 
@@ -120,7 +116,7 @@ class Game:
 
     def render(self): 
         """Print current turn nbr/total turns req'd & a repr. of curr game state."""  
-        # This is obviously not the actual final render function. #  
+        # This is not the actual final render function. #  
         print("Current move: " + str(self.currmove+1) +"/"+ str(self.lastmove)) 
         print("Left   = " + str(self.left))
         print("Center = " + str(self.center))
@@ -152,13 +148,15 @@ if __name__ == "__main__":
     game = Game(numdiscs)
 
     game.Verbose = True 
-    print("Discs = " + str(game.discs))
 
-    while (game.terminated==False): 
-        game.playOneTurn()
-    print("The game is over. It took " + str(game.currmove) + " moves. ") 
+    if (numdiscs==0 or numdiscs>100): 
+        print("Please choose a number in [1,100].") 
+    else: 
+        while (game.terminated==False): 
+            game.playOneTurn()
+        print("The game is over. It took " + str(game.currmove) + " moves. ") 
 
-    #If interactive: Render initial game state (0 moves in)! 
+    #If interactive: Immediately render initial game state (0 moves in)! 
 
     #For i in range(numdiscs), run game.playOneTurn() 
     #Or better (pretty sure), while game.terminated==False, run game.playOneTurn() 
@@ -166,7 +164,6 @@ if __name__ == "__main__":
     #Then print "The End!" and exit. Or maybe make that part of render fn.  
 
     
-
 #Extensions 
 #Add functionality allowing user to step through the game via RETURN key 
 #use argparse? https://docs.python.org/3/howto/argparse.html#id1 
@@ -175,4 +172,4 @@ if __name__ == "__main__":
 #And if you can do this, you can probably allow user to start new game with n discs 
 #in the same session by typing an integer instead of RETURN 
 #Remember to free() the old game :P or del it or wtv you do in Python 
-#And if you do that then you have to make an exit() command, too. 
+#And if you do that then you have to make a quit command, too. 

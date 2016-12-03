@@ -23,9 +23,11 @@ Current move: 2/8
 Left   Peg = [3, 2]
 Center Peg = []
 Right  Peg = [1]
+```
 
 This translates to the following: 
 
+```
     |       |       |    
   ==2==     |       |
  ===3===    |      =1=   

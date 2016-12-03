@@ -46,12 +46,13 @@ class Game:
         - Every even 1-bit sets a Dest and sets an Origin to its LEFT.    
         - Every odd 1-bit sets a Dest and sets an Origin to its RIGHT. 
         - 0-bits do not update the peg configuration. 
+        - A substring of consecutive equal-valued bits represents a stack of 
+          consecutive discs on the same peg. 
         - If we are stacking discs represented by 1-bits onto the Dest peg, 
           the position of the first disc represented by a 0-bit is determined 
           by the following pattern: DOMOM..OM. Similarly, stacking 0-bit discs 
-          onto Origin or Middle pegs follows patterns OMDMD..MD and MODOD..OD 
-          respectively. A string of equal-valued bits represents a stack of 
-          consecutive discs on the same peg. 
+          onto Origin or Middle pegs determines the position of the next 1-bit
+          encountered via the patterns OMDMD..MD and MODOD..OD respectively. 
         - If currbits[0]==1, the largest disc is placed on the Right peg.  
         """ 
 
@@ -64,18 +65,16 @@ class Game:
 
         # Initialize state according to first bit # 
         if (self.currbits[0]==1): 
-            destin = 2 
             origin = 1 
             middle = 0 
-            anchor = origin 
         else: 
             origin = 0
             middle = 1
-            destin = 2
-            anchor = origin 
-        
-        i = 0 
+        destin = 2
+        anchor = origin 
+         
         # i is your current disc index. discs-i for intuition/rendering purposes. 
+        i = 0
 
         while (i<self.discs): 
             # Setting down 0-bits # 
@@ -116,7 +115,6 @@ class Game:
 
     def render(self): 
         """Print current turn nbr/total turns req'd & a repr. of curr game state."""  
-        # This is not the actual final render function. #  
         print("Current move: " + str(self.currmove+1) +"/"+ str(self.lastmove)) 
         print("Left   Peg = " + str(self.left))
         print("Center Peg = " + str(self.center))
@@ -167,6 +165,9 @@ if __name__ == "__main__":
 
     
 #Extensions 
+
+#Output: ASCII pegs? This would get ridiculous/impossible beyond around 15 discs. 
+
 #Add functionality allowing user to step through the game via RETURN key 
 #use argparse? https://docs.python.org/3/howto/argparse.html#id1 
 #This would replace the for/while loop you have now 

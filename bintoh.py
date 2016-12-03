@@ -10,6 +10,7 @@ class Game:
         self.terminated = False 
         self.discs = numdiscs
         self.currmove = 0
+        self.lastmove = 2**numdiscs
         self.currbits = [] 
         
         self.left = [] 
@@ -34,9 +35,10 @@ class Game:
                 self.currbits.append(int(binmove[i-ldzeros])) 
 
         if (self.Verbose): 
-            print("currbits = " + str(self.currbits) + " currmove = " + str(self.currmove)) 
+            print("currbits = " + str(self.currbits)) 
 
     def bitsToState(self): 
+        # You'll need to update these! # 
         """Take the current bit array and translate to corresponding game state.
 
         The rules of the simulation are as follows, and this function implements 
@@ -63,81 +65,63 @@ class Game:
 
         # Initialize state according to first bit # 
         if (self.currbits[0]==1): 
-            zeromode = False 
-            destin = self.pegs[2] 
-            origin = self.pegs[1] 
-            middle = self.pegs[0] 
+            destin = 2 
+            origin = 1 
+            middle = 0 
+            anchor = origin 
         else: 
-            zeromode = True 
-            origin = self.pegs[0]
-            middle = self.pegs[1]
-            destin = self.pegs[2]
+            origin = 0
+            middle = 1
+            destin = 2
+            anchor = origin 
         
-
         i = 0 
         # i is your current disc index. discs-i for intuition/rendering purposes. 
+
         while (i<self.discs): 
-            if (zeromode):
-                # This block should only be entered 0 or 1 times per call # 
-                j = 0 
-                while (i<self.discs and self.currbits[i]==0): 
-                    origin.append(self.discs-i) 
-                    i += 1 
-                    j += 1 
+            # Setting down 0-bits # 
+            j = 0
+            while (i<self.discs and self.currbits[i]==0): 
+                self.pegs[anchor].append(self.discs-i)
+                i += 1
+                j += 1
 
-                # Shifting out of zeromode: Update configs, in partic. dest # 
-                if ((j%2)==1): 
-                    # New dest peg is current middle peg 
-                    middidx = self.pegs.index(middle) 
-                    destin = self.pegs[middidx] 
-                    # Else, dest peg remains same; we do nothing. 
-                zeromode = False 
-            else:
-                # Not in zeromode! # 
-                j = 0 
-                while (i<self.discs and self.currbits[i]==1): 
-                    destin.append(self.discs-i)
-                    i += 1 
-                    j += 1   
-
-                # ***Naw dude you can't do this. 0010 need to update first*** # 
-                # Now we are back in zeromode # 
-                k = 0 
-                if ((j%2)==0): 
-                    # Stack 0-bits on middle peg #  
-                    while (i<self.discs and self.currbits[i]==0): 
-                        middle.append(self.discs-i) 
-                        i += 1 
-                        k += 1  
+            # About to set down a leading 1-bit, so update configs, in partic. dest # 
+            if ((j%2)==1):
+                # New dest peg is current middle peg                                            
+                #destin = middle
+                # Else, dest peg remains same; we do nothing.  
+                if (anchor==origin): 
+                   destin = middle 
                 else: 
-                    # Stack 0-bits on origin peg # 
-                    while (i<self.discs and self.currbits[i]==0): 
-                        origin.append(self.discs-i) 
-                        i += 1 
-                        k += 1 
+                   destin = origin 
 
-                # Shifting out of zeromode: Update configs, in partic. dest #
-                if ((k%2)==1):
-                    # New dest peg is current middle peg
-                    middidx = self.pegs.index(middle)
-                    destin = self.pegs[middidx]
-                    # Else, dest peg remains same; we do nothing.
+            if ((i%2)==0):
+                # We have an even 1-bit; set origin to LEFT of dest #     
+                origin = (destin-1)%3
+                middle = (destin+1)%3
+            else:
+                # We have an odd 1-bit; set origin to RIGHT of dest #       
+                origin = (destin+1)%3
+                middle = (destin-1)%3
 
-            destidx = self.pegs.index(destin) 
+            # Now setting down 1-bits # 
+            j = 0
+            while (i<self.discs and self.currbits[i]==1):
+                self.pegs[destin].append(self.discs-i)
+                i += 1
+                j += 1
 
-            if ((i%2)==0): 
-                # We have an even 1-bit; set origin to LEFT of dest # 
-                origin = self.pegs[(destidx-1)%3]
-                middle = self.pegs[(destidx+1)%3]
+            if ((j%2)==0): 
+                anchor = middle 
             else: 
-                # We have an odd 1-bit; set origin to RIGHT of dest #
-                origin = self.pegs[(destidx+1)%3]
-                middle = self.pegs[(destidx-1)%3]
+                anchor = origin 
 
 
     def render(self): 
         """Print current turn nbr/total turns req'd & a repr. of curr game state."""  
         # This is obviously not the actual final render function. #  
+        print("Current move: " + str(self.currmove+1) +"/"+ str(self.lastmove)) 
         print("Left   = " + str(self.left))
         print("Center = " + str(self.center))
         print("Right  = " + str(self.right))
@@ -154,7 +138,7 @@ class Game:
             self.bitsToState()
             self.render()
             self.currmove += 1 
-            if (self.currmove==2**self.discs): 
+            if (self.currmove==self.lastmove): 
                 self.terminated = True  
         else: 
             print("The game is over! It took " + str(self.currmove) + " moves. ") 

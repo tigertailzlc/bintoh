@@ -29,12 +29,12 @@ class Game:
         binmove = binmove.lstrip('-0b')      # remove leading zeros and minus sign 
         ldzeros = self.discs-len(binmove)    # number of leading zeros 
         for i in range(self.discs): 
-            if (i<ldzeros): 
+            if i < ldzeros: 
                 self.currbits.append(0) 
             else: 
                 self.currbits.append(int(binmove[i-ldzeros])) 
 
-        if (self.Verbose): 
+        if self.Verbose: 
             print("Bit Array = " + str(self.currbits)) 
 
     def bitsToState(self): 
@@ -64,7 +64,7 @@ class Game:
         del self.right[:]
 
         # Initialize state according to first bit # 
-        if (self.currbits[0]==1): 
+        if self.currbits[0]==1: 
             origin = 1 
             middle = 0 
         else: 
@@ -76,22 +76,22 @@ class Game:
         # i is your current disc index. discs-i for intuition/rendering purposes. 
         i = 0
 
-        while (i<self.discs): 
+        while i < self.discs: 
             # Setting down 0-bits # 
             j = 0
-            while (i<self.discs and self.currbits[i]==0): 
+            while i < self.discs and self.currbits[i] == 0: 
                 self.pegs[anchor].append(self.discs-i)
                 i += 1
                 j += 1
 
             # About to set down a leading 1-bit, so update configs, in partic. dest # 
-            if ((j%2)==1):
-                if (anchor==origin): 
+            if j % 2 == 1:
+                if anchor == origin: 
                    destin = middle 
                 else: 
                    destin = origin 
 
-            if ((i%2)==0):
+            if i % 2 == 0:
                 # We have an even 1-bit; set origin to LEFT of dest #     
                 origin = (destin-1)%3
                 middle = (destin+1)%3
@@ -102,20 +102,20 @@ class Game:
 
             # Now setting down 1-bits # 
             j = 0
-            while (i<self.discs and self.currbits[i]==1):
+            while i < self.discs and self.currbits[i] == 1:
                 self.pegs[destin].append(self.discs-i)
                 i += 1
                 j += 1
 
-            if ((j%2)==0): 
+            if j % 2 == 0: 
                 anchor = middle 
             else: 
                 anchor = origin 
 
 
     def render(self): 
-        """Print current turn nbr/total turns req'd & a repr. of curr game state."""  
-        print("Current move: " + str(self.currmove+1) +"/"+ str(self.lastmove)) 
+        """Print current turn nbr/total turns req'd & a repr. of curr game state."""   
+        print(str(self.currmove)+"/"+str(self.lastmove-1)+" moves made.")
         print("Left   Peg = " + str(self.left))
         print("Center Peg = " + str(self.center))
         print("Right  Peg = " + str(self.right))
@@ -128,15 +128,18 @@ class Game:
         I am keeping it because I think it will be better for stepthrough mode 
         to check here instead of in the main function. 
         """  
-        if (self.terminated==False): 
+        if self.terminated == False: 
             self.createBits()
             self.bitsToState()
             self.render()
             self.currmove += 1 
-            if (self.currmove==self.lastmove): 
+            if self.currmove == self.lastmove: 
                 self.terminated = True  
         else: 
-            print("The game is over! It took " + str(self.currmove) + " moves. ") 
+            if self.currmove - 1 == 1: 
+                print("The game is over. It took 1 move.")
+            else: 
+                print("The game is over. It took " + str(self.currmove-1) + " moves. ") 
 
 
 
@@ -148,13 +151,16 @@ if __name__ == "__main__":
 
     game.Verbose = False 
 
-    if (numdiscs<=0):
+    if numdiscs <= 0:
         # Upper bound? But what would it be? # 
         print("Please choose a disc number of 1 or larger.") 
     else: 
-        while (game.terminated==False): 
+        while game.terminated == False: 
             game.playOneTurn()
-        print("The game is over. It took " + str(game.currmove) + " moves. ") 
+        if game.currmove - 1 == 1: 
+            print("The game is over. It took 1 move.") 
+        else: 
+            print("The game is over. It took " + str(game.currmove-1) + " moves. ") 
 
     #If interactive: Immediately render initial game state (0 moves in)! 
 
